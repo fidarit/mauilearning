@@ -1,4 +1,6 @@
-﻿namespace MauiLearning
+﻿using Microsoft.Maui.Controls;
+
+namespace MauiLearning
 {
     public partial class App : Application
     {

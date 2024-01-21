@@ -1,42 +1,48 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.OS;
-using Android.Runtime;
+using Android.Provider;
+using Android.Widget;
+using Uri = Android.Net.Uri;
 
 namespace MauiLearning.Platforms.Android
 {
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     public class MainActivity : MauiAppCompatActivity
     {
-        Intent intent;
+        public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 2323;
 
-        protected override void OnStop()
+        private Intent? intent;
+
+        protected override void OnStart()
         {
-            if (OperatingSystem.IsAndroidVersionAtLeast(23))
+            base.OnStart();
+                        
+            if (!Settings.CanDrawOverlays(this))
             {
-                intent = new Intent(this, typeof(FloatingService));
+                Toast.MakeText(this, "Can't get permissions. Add it manually", ToastLength.Long)?.Show();
 
-                Permissions.
-                if (!Settings.CanDrawOverlays(this))
-                {
-                    StartActivityForResult(new Intent(Settings.ActionManageOverlayPermission, Android.Net.Uri.Parse("package:" + PackageName)), 0);
-                }
-                else
-                {
-                    StartService(intent);
-                }
+                var uri = Uri.Parse($"package: {PackageName}");
+                var newIntent = new Intent(Settings.ActionManageOverlayPermission, uri);
+
+                StartActivityForResult(newIntent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
             }
-
-            base.OnStop();
+            else
+                StartService();
         }
 
-        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
         {
-            if (OperatingSystem.IsAndroidVersionAtLeast(23) && requestCode == 0)
-            {
-                StartService(new Intent(this, typeof(FloatingService)));
-            }
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE && resultCode != Result.Canceled)
+                StartService();
+        }
+
+        public bool StartService()
+        {
+            intent = new Intent(this, typeof(FloatingService));
+            return StartService(intent) != null;
         }
     }
 }
