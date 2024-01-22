@@ -2,8 +2,12 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.Provider;
+using Android.Views;
 using Android.Widget;
+using Android.Util;
 using Uri = Android.Net.Uri;
+using Android.Hardware.Input;
+using Android.Views.InputMethods;
 
 namespace MauiLearning.Platforms.Android
 {
@@ -17,7 +21,42 @@ namespace MauiLearning.Platforms.Android
         protected override void OnStart()
         {
             base.OnStart();
-                        
+
+            var input = InputMethodManager.FromContext(this);
+            
+            input.
+
+            foreach (var id in InputDevice.GetDeviceIds()!)
+            {
+                var device = InputDevice.GetDevice(id);
+                
+                if (device?.MotionRanges == null)
+                    continue;
+
+                foreach (var item in device!.MotionRanges)
+                {
+                    var data = new InputData();
+                    data.DeviceName = $"{device.Name} {item.Axis}";
+
+                    Task.Run(() =>
+                    {
+                        while(true)
+                        {
+                            item.Wait();
+
+                            data.Value = $"{item.Flat} \t {item.Fuzz}";
+                        }
+                    });
+
+                    InputViewModel.Instance.Add(data);
+                }
+            }
+
+
+
+
+            return;
+
             if (!Settings.CanDrawOverlays(this))
             {
                 Toast.MakeText(this, "Can't get permissions. Add it manually", ToastLength.Long)?.Show();

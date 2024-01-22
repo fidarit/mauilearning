@@ -1,7 +1,9 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Hardware;
 using Android.OS;
 using Android.Runtime;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using View = Android.Views.View;
@@ -30,9 +32,11 @@ namespace MauiLearning.Platforms.Android
 
         public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
         {
-            showFloatingWindow();
+
+            //showFloatingWindow();
             return StartCommandResult.NotSticky;
         }
+
 
 
         private void showFloatingWindow()
@@ -60,12 +64,6 @@ namespace MauiLearning.Platforms.Android
                 | WindowManagerFlags.NotTouchModal 
                 | WindowManagerFlags.LayoutNoLimits
             };
-
-            foreach (var id in InputDevice.GetDeviceIds()!)
-            {
-                var device = InputDevice.GetDevice(id);
-                Toast.MakeText(ApplicationContext, device?.Name, ToastLength.Long)?.Show();
-            }
 
             windowManager.AddView(floatView, layoutParams);
         }

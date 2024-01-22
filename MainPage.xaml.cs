@@ -7,10 +7,15 @@ namespace MauiLearning
 {
     public partial class MainPage : ContentPage
     {
+        private InputViewModel viewModel;
+
         int count = 0;
         public MainPage()
         {
             InitializeComponent();
+
+            viewModel = new InputViewModel();
+            inputListView.ItemsSource = viewModel;
         }
 
         private void OnCounterClicked(object sender, EventArgs e)
